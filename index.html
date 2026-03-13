@@ -2,258 +2,148 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>FC Online Ultimate - Save Game Edition</title>
-    <style>
-        body { background: #0a0a0a; color: white; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; padding: 10px; }
-        .header { background: #1a1a1a; width: 100%; max-width: 380px; padding: 15px; border-radius: 15px; display: flex; justify-content: space-between; margin-bottom: 15px; border: 1px solid #333; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
-        .bp-val { color: #fde100; font-weight: bold; font-size: 1.1em; }
-        .game-container { background: #a50021; padding: 20px; border-radius: 25px; box-shadow: 0 15px 50px rgba(0,0,0,0.8); width: 340px; text-align: center; border: 3px solid #fde100; position: relative; }
-        .card { width: 150px; height: 220px; background: #fff; color: #000; border-radius: 12px; margin: 15px auto; display: flex; flex-direction: column; justify-content: center; font-weight: bold; transition: 0.4s; position: relative; overflow: hidden; }
-        .plus-8 { background: linear-gradient(135deg, #ffd700, #ff8c00) !important; color: #fff !important; box-shadow: 0 0 30px #ffd700; transform: scale(1.05); border: 2px solid #fff; }
-        .btn { width: 100%; padding: 12px; margin: 5px 0; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
-        .btn-pack { background: #3498db; color: white; }
-        .btn-upgrade { background: #fde100; color: #a50021; }
-        .btn-sell { background: #2ecc71; color: white; }
-        #log { font-size: 13px; margin: 10px 0; font-weight: bold; height: 18px; color: #fde100; }
-    </style>
-</head>
-<body>
-    <div class="header">
-        <span>BP: <span id="bpDisplay" class="bp-val">1,000,000</span></span>
-        <button onclick="resetData()" style="font-size:10px; background:none; border:1px solid #555; color:#aaa; cursor:pointer;">Xóa dữ liệu</button>
-    </div>
-    <div class="game-container">
-        <div id="log">CHÀO MỪNG QUAY TRỞ LẠI!</div>
-        <div id="card" class="card">
-            <div id="nameDisplay">HÃY MỞ GÓI</div>
-            <div id="lvDisplay" style="font-size:40px;">?</div>
-            <div id="priceDisplay" style="font-size:11px; margin-top:10px;">0 BP</div>
-        </div>
-        <button class="btn btn-pack" onclick="openPack()">Mở Gói Quà (50k BP)</button>
-        <button id="upBtn" class="btn btn-upgrade" onclick="upgrade()" disabled>Nâng cấp (20k BP)</button>
-        <button id="sellBtn" class="btn btn-sell" onclick="sell()" disabled>Bán cầu thủ</button>
-    </div>
-
-<script>
-    let bp = parseInt(localStorage.getItem('bp')) || 1000000;
-    let currentLv = 1;
-    let currentBasePrice = 0;
-    let currentName = "HÃY MỞ GÓI";
-
-    const playerList = [
-        {name: "M. Salah", price: 120000}, {name: "V. Van Dijk", price: 110000},
-        {name: "S. Gerrard", price: 500000}, {name: "Luis Diaz", price: 80000},
-        {name: "Alisson", price: 90000}, {name: "D. Nunez", price: 70000},
-        {name: "F. Torres", price: 450000}, {name: "Xabi Alonso", price: 400000}
-    ];
-
-    function updateUI() {
-        localStorage.setItem('bp', bp);
-        document.getElementById('bpDisplay').innerText = bp.toLocaleString();
-        document.getElementById('lvDisplay').innerText = "+" + currentLv;
-        document.getElementById('nameDisplay').innerText = currentName;
-
-        let currentPrice = currentBasePrice * Math.pow(2.8, currentLv - 1);
-        if (currentLv >= 5) currentPrice *= 2;
-        if (currentLv === 8) currentPrice *= 6;
-        document.getElementById('priceDisplay').innerText = Math.floor(currentPrice).toLocaleString() + " BP";
-        
-        const card = document.getElementById('card');
-        card.className = "card";
-        if (currentLv >= 8) card.classList.add('plus-8');
-        else if (currentLv >= 5) card.style.background = "#c0c0c0";
-        else card.style.background = "#fff";
-
-        document.getElementById('upBtn').disabled = currentBasePrice === 0;
-        document.getElementById('sellBtn').disabled = currentBasePrice === 0;
-    }
-
-    function openPack() {
-        if (bp < 50000) return;
-        bp -= 50000;
-        const rand = playerList[Math.floor(Math.random() * playerList.length)];
-        currentName = rand.name; currentBasePrice = rand.price; currentLv = 1;
-        document.getElementById('log').innerText = "MỞ RA " + currentName.toUpperCase();
-        updateUI();
-    }
-
-    function upgrade() {
-        if (bp < 20000) return;
-        bp -= 20000;
-        const rates = [1, 0.65, 0.45, 0.28, 0.12, 0.06, 0.02];
-        if (Math.random() < rates[currentLv - 1]) {
-            currentLv++;
-            document.getElementById('log').innerText = "THÀNH CÔNG!";
-        } else {
-            currentLv = 1;
-            document.getElementById('log').innerText = "XỊT RỒI!";
-        }
-        updateUI();
-    }
-
-    function sell() {
-        let currentPrice = currentBasePrice * Math.pow(2.8, currentLv - 1);
-        if (currentLv >= 5) currentPrice *= 2;
-        if (currentLv === 8) currentPrice *= 6;
-        bp += Math.floor(currentPrice);
-        currentBasePrice = 0; currentName = "HÃY MỞ GÓI"; currentLv = 1;
-        updateUI();
-    }
-
-    function resetData() {
-        localStorage.clear();
-        location.reload();
-    }
-
-    updateUI();
-</script>
-</body>
-</html><!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <title>FC Online Pro Dashboard</title>
+    <title>FC Online 4 Simulator - Pro Edition</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { 
-            background: url('https://images.unsplash.com/photo-1508098682722-e99c43a406b2?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80') no-repeat center center fixed;
-            background-size: cover;
-            color: white; font-family: 'Segoe UI', Arial, sans-serif;
-            height: 100vh; overflow: hidden;
+            background: #000 url('https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=1400') no-repeat center center fixed;
+            background-size: cover; color: white; font-family: 'Segoe UI', sans-serif; height: 100vh; overflow: hidden;
         }
-        /* Lớp phủ làm tối nền */
-        .overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: -1; }
+        .overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: -1; }
 
         /* Top Bar */
-        .top-bar { 
-            background: rgba(43, 87, 154, 0.9); height: 50px; 
-            display: flex; align-items: center; padding: 0 20px;
-            border-bottom: 2px solid #3498db; font-size: 13px;
-        }
-        .top-menu { display: flex; list-style: none; margin-left: 50px; }
-        .top-menu li { margin-right: 30px; cursor: pointer; text-transform: uppercase; font-weight: bold; color: #ddd; }
-        .top-menu li:hover { color: #fff; border-bottom: 2px solid #fff; }
+        .top-bar { background: rgba(10, 40, 90, 0.95); height: 50px; display: flex; align-items: center; padding: 0 20px; border-bottom: 2px solid #3498db; }
+        .currency { margin-left: auto; color: #fde100; font-weight: bold; font-size: 18px; }
 
-        /* Sidebar Menu */
-        .sidebar { position: absolute; left: 50px; top: 150px; width: 250px; }
-        .side-item { 
-            padding: 12px 20px; font-size: 18px; font-weight: bold; 
-            text-transform: uppercase; cursor: pointer; transition: 0.3s;
-            margin-bottom: 5px; display: flex; align-items: center;
-        }
-        .side-item:hover { background: rgba(255,255,255,0.2); transform: translateX(10px); }
-        .tag-gray { font-size: 10px; background: #666; padding: 2px 5px; margin-left: 10px; border-radius: 3px; }
-
-        /* Trung tâm đập thẻ (Game Container) */
-        .main-content { 
-            position: absolute; right: 50px; top: 100px; 
-            background: rgba(0,0,0,0.7); padding: 25px; 
-            border-radius: 15px; width: 320px; text-align: center;
-            border-top: 5px solid #a50021;
-        }
-        .bp-display { color: #fde100; font-size: 20px; margin-bottom: 15px; border-bottom: 1px solid #444; padding-bottom: 10px; }
-        .card { 
-            width: 140px; height: 200px; background: #fff; color: #000; 
-            border-radius: 8px; margin: 15px auto; display: flex; flex-direction: column; 
-            justify-content: center; font-weight: bold; position: relative;
-        }
-        .plus-8 { background: linear-gradient(135deg, #ffd700, #ff8c00) !important; color: white !important; box-shadow: 0 0 20px #ffd700; }
+        /* Main Game Layout */
+        .container { display: flex; justify-content: space-between; padding: 40px 100px; height: calc(100vh - 90px); }
         
-        /* Bottom Bar */
-        .bottom-bar { 
-            position: fixed; bottom: 0; width: 100%; background: rgba(0,0,0,0.8); 
-            height: 40px; display: flex; align-items: center; padding: 0 20px; font-size: 12px;
-        }
-        .bottom-menu { display: flex; list-style: none; }
-        .bottom-menu li { margin-right: 20px; color: #aaa; cursor: pointer; }
+        /* Menu Left */
+        .sidebar { width: 250px; }
+        .side-item { padding: 15px; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s; border-radius: 5px; margin-bottom: 5px; text-transform: uppercase; }
+        .side-item:hover { background: rgba(255,255,255,0.1); padding-left: 25px; color: #fde100; }
+        .active { border-left: 5px solid #fde100; background: rgba(255,255,255,0.1); }
 
-        button { width: 100%; padding: 10px; margin-top: 10px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
-        .btn-up { background: #fde100; color: #a50021; }
+        /* Card Center */
+        .card-zone { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .card { 
+            width: 200px; height: 300px; background: #fff; color: #000; border-radius: 10px; 
+            box-shadow: 0 0 30px rgba(0,0,0,0.5); display: flex; flex-direction: column; align-items: center; 
+            justify-content: center; transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); position: relative;
+        }
+        .plus-8 { background: linear-gradient(135deg, #ffd700, #ff8c00) !important; color: #fff !important; box-shadow: 0 0 50px #ffd700; transform: scale(1.1); border: 2px solid white; }
+        .shake { animation: shake 0.4s; }
+        @keyframes shake { 0%, 100% {transform: translateX(0);} 25% {transform: translateX(-10px);} 75% {transform: translateX(10px);} }
+
+        /* Actions */
+        .actions { width: 300px; background: rgba(0,0,0,0.8); padding: 20px; border-radius: 15px; border-top: 4px solid #a50021; }
+        .btn { width: 100%; padding: 15px; margin: 10px 0; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
+        .btn-up { background: #fde100; color: #a50021; font-size: 16px; }
+        .btn-pack { background: #3498db; color: white; }
+        .btn:active { transform: scale(0.95); }
+        #status { margin-top: 15px; font-style: italic; color: #fde100; font-size: 14px; }
     </style>
 </head>
 <body>
     <div class="overlay"></div>
 
     <div class="top-bar">
-        <img src="https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg" width="30" alt="LFC">
-        <ul class="top-menu">
-            <li>Đại diện thông tin đội</li>
-            <li>Club House</li>
-            <li>Đại diện quản lý đội</li>
-            <li>Chiến thuật nhóm</li>
-        </ul>
-        <div style="margin-left: auto;">LV.8 | BP: <span id="bpHeader" style="color:#fde100">1,000,000</span></div>
+        <img src="https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg" width="30" style="margin-right: 15px;">
+        <span style="font-weight:bold; letter-spacing:1px;">FC ONLINE 4 SIMULATOR</span>
+        <div class="currency">BP: <span id="bpValue">1,000,000</span></div>
     </div>
 
-    <div class="sidebar">
-        <div class="side-item">Trận XH <span class="tag-gray">VS Người chơi</span></div>
-        <div class="side-item">XH 2vs2 <span class="tag-gray">VS Người chơi</span></div>
-        <div class="side-item" style="color: #fde100;">Giả lập XH <span class="tag-gray">AUTO</span></div>
-        <div class="side-item">Squad Battle <span class="tag-gray">VS AI</span></div>
-        <div class="side-item">Arena <span class="tag-gray">VS Người chơi</span></div>
-    </div>
-
-    <div class="main-content">
-        <div class="bp-display">TÀI KHOẢN BP: <span id="bpMain">1,000,000</span></div>
-        <div id="card" class="card">
-            <div id="playerName">K. DALGLISH</div>
-            <div id="lvDisplay" style="font-size: 35px;">+1</div>
+    <div class="container">
+        <div class="sidebar">
+            <div class="side-item active">Trung tâm đập thẻ</div>
+            <div class="side-item">Thị trường chuyển nhượng</div>
+            <div class="side-item">Mở gói quà</div>
+            <div class="side-item">Quản lý đội hình</div>
         </div>
-        <button class="btn-up" onclick="upgrade()">NÂNG CẤP THẺ</button>
-        <button style="background:#3498db; color:white;" onclick="openPack()">MỞ GÓI CẦU THỦ</button>
-        <p id="log" style="font-size:12px; margin-top:10px; color:#ccc;">Sẵn sàng phá án!</p>
-    </div>
 
-    <div class="bottom-bar">
-        <ul class="bottom-menu">
-            <li>● Quản lý CT</li>
-            <li>● TT Nhiệm vụ</li>
-            <li>● TT Chuyển nhượng</li>
-            <li>● Vật phẩm</li>
-            <li>● Shop</li>
-        </ul>
+        <div class="card-zone">
+            <div id="card" class="card">
+                <div id="pName" style="font-size:18px; margin-bottom:10px;">CHỌN CẦU THỦ</div>
+                <div id="pLv" style="font-size:60px;">+0</div>
+            </div>
+            <div id="status">Bắt đầu xây dựng đội hình Liverpool của bạn!</div>
+        </div>
+
+        <div class="actions">
+            <button class="btn btn-pack" onclick="openPack()">Mở Gói Kim Cương (100k BP)</button>
+            <button class="btn btn-up" onclick="upgrade()">Nâng Cấp Thẻ (30k BP)</button>
+            <button class="btn" style="background:#2ecc71; color:white;" onclick="sell()">Bán Cầu Thủ</button>
+            <button class="btn" style="background:#555; color:white; font-size:10px; padding:5px;" onclick="reset()">Reset Game</button>
+        </div>
     </div>
 
     <script>
-        let bp = 1000000;
+        // Hệ thống lưu trữ dữ liệu (Save Game)
+        let bp = parseInt(localStorage.getItem('fco_bp')) || 1000000;
         let lv = 1;
-        const players = ["K. Dalglish", "S. Gerrard", "Fernando Torres", "Luis Suarez"];
-        let currentName = "K. DALGLISH";
+        let currentP = localStorage.getItem('fco_player') || "K. DALGLISH";
+        let baseP = 150000;
+
+        const players = ["M. Salah", "V. Van Dijk", "S. Gerrard", "F. Torres", "Alisson", "Darwin Nunez"];
 
         function updateUI() {
-            document.getElementById('bpMain').innerText = bp.toLocaleString();
-            document.getElementById('bpHeader').innerText = bp.toLocaleString();
-            document.getElementById('lvDisplay').innerText = "+" + lv;
-            document.getElementById('playerName').innerText = currentName;
+            localStorage.setItem('fco_bp', bp);
+            localStorage.setItem('fco_player', currentP);
+            document.getElementById('bpValue').innerText = bp.toLocaleString();
+            document.getElementById('pName').innerText = currentP.toUpperCase();
+            document.getElementById('pLv').innerText = "+" + lv;
             
             const card = document.getElementById('card');
             card.className = "card";
-            if (lv === 8) card.classList.add('plus-8');
+            if (lv >= 8) card.classList.add('plus-8');
             else if (lv >= 5) card.style.background = "#c0c0c0";
+            else card.style.background = "#fff";
+        }
+
+        function openPack() {
+            if (bp < 100000) { alert("Không đủ BP!"); return; }
+            bp -= 100000;
+            currentP = players[Math.floor(Math.random()*players.length)];
+            lv = 1;
+            document.getElementById('status').innerText = "Bạn đã mở ra " + currentP + "!";
+            updateUI();
         }
 
         function upgrade() {
-            if (bp < 20000) return;
-            bp -= 20000;
-            const rates = [1, 0.7, 0.5, 0.3, 0.1, 0.05, 0.02];
+            if (bp < 30000) { alert("Không đủ BP!"); return; }
+            bp -= 30000;
+            const card = document.getElementById('card');
+            // Tỉ lệ đập thẻ ảo như thật
+            const rates = [1, 0.7, 0.45, 0.25, 0.12, 0.05, 0.02];
+            
             if (Math.random() < rates[lv-1]) {
                 lv++;
-                document.getElementById('log').innerText = "THÀNH CÔNG!";
+                document.getElementById('status').innerText = "NÂNG CẤP THÀNH CÔNG! QUÁ ĐỈNH!";
             } else {
                 lv = 1;
-                document.getElementById('log').innerText = "THẤT BẠI!";
+                document.getElementById('status').innerText = "XỊT RỒI! CHIA BUỒN VỚI BẠN.";
+                card.classList.add('shake');
+                setTimeout(() => card.classList.remove('shake'), 400);
             }
             updateUI();
         }
 
-        function openPack() {
-            if (bp < 50000) return;
-            bp -= 50000;
-            currentName = players[Math.floor(Math.random()*players.length)].toUpperCase();
-            lv = 1;
-            document.getElementById('log').innerText = "MỞ RA " + currentName;
+        function sell() {
+            let price = baseP * Math.pow(3, lv-1);
+            bp += Math.floor(price);
+            document.getElementById('status').innerText = "Đã bán thu về " + Math.floor(price).toLocaleString() + " BP";
+            lv = 1; currentP = "CHỌN CẦU THỦ";
             updateUI();
         }
+
+        function reset() {
+            if (confirm("Xóa hết tiền và làm lại từ đầu?")) {
+                localStorage.clear();
+                location.reload();
+            }
+        }
+
+        updateUI();
     </script>
 </body>
 </html>
