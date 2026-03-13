@@ -188,3 +188,83 @@ function exitMatch() {
     
     alert("Đã thoát trận đấu và quay về sảnh chính!");
 }
+<div id="tab-upgrade" class="content">
+    <h2>TRUNG TÂM NÂNG CẤP</h2>
+    <div id="upCard" class="card">
+        <div id="upName">CHƯA CÓ CẦU THỦ</div>
+        <div id="upLv" style="font-size:40px">+0</div>
+    </div>
+
+    <div style="width: 80%; margin: 10px auto;">
+        <div style="font-size: 12px; display: flex; justify-content: space-between;">
+            <span>Tỉ lệ cộng thêm: <span id="bonusText">0</span>%</span>
+            <span>Phí phôi: 100,000 BP</span>
+        </div>
+        <div style="width: 100%; height: 8px; background: #444; border-radius: 4px; margin-top: 5px;">
+            <div id="bonusBar" style="width: 0%; height: 100%; background: #2ecc71; border-radius: 4px; transition: 0.3s;"></div>
+        </div>
+    </div>
+
+    <button class="btn" style="background: #3498db; color: white;" onclick="addMaterial()">DÙNG PHÔI (TĂNG TỈ LỆ)</button>
+    <button class="btn btn-gold" onclick="upgrade()">NÂNG CẤP (50,000 BP)</button>
+    <button class="btn" style="background: #e74c3c; color: white;" onclick="exitToMenu()">THOÁT</button>
+</div>
+
+<script>
+    // Thêm biến quản lý tỉ lệ bonus
+    let bonusRate = 0;
+
+    function updateUI() {
+        // ... (giữ các dòng cũ của bạn) ...
+        document.getElementById('bpDisplay').innerText = bp.toLocaleString();
+        document.getElementById('upName').innerText = myPlayer.toUpperCase();
+        document.getElementById('upLv').innerText = "+" + myLv;
+        
+        // Cập nhật thanh tỉ lệ
+        document.getElementById('bonusBar').style.width = (bonusRate * 100 * 5) + "%"; // Hiển thị thanh đầy khi bonus là 20%
+        document.getElementById('bonusText').innerText = Math.round(bonusRate * 100);
+
+        const upCard = document.getElementById('upCard');
+        upCard.className = "card";
+        if(myLv >= 8) upCard.classList.add('plus-8');
+        else if(myLv >= 5) upCard.style.background = "#c0c0c0";
+        
+        localStorage.setItem('fco_bp', bp);
+        localStorage.setItem('fco_pName', myPlayer);
+        localStorage.setItem('fco_pLv', myLv);
+    }
+
+    function addMaterial() {
+        if (bp < 100000) return alert("Không đủ tiền mua phôi!");
+        if (bonusRate >= 0.2) return alert("Tỉ lệ đã đạt mức tối đa (+20%)!");
+        
+        bp -= 100000;
+        bonusRate += 0.04; // Mỗi lần bấm tăng 4% tỉ lệ
+        updateUI();
+    }
+
+    function upgrade() {
+        if (myLv === 0) return alert("Hãy mở gói trước!");
+        if (bp < 50000) return alert("Không đủ tiền!");
+        
+        bp -= 50000;
+        // Tỉ lệ gốc + Tỉ lệ bonus từ phôi
+        const baseRate = [1, 0.7, 0.45, 0.25, 0.12, 0.06, 0.02][myLv-1] || 0.01;
+        const finalRate = baseRate + bonusRate;
+
+        if (Math.random() < finalRate) {
+            myLv++;
+            alert("THÀNH CÔNG! Chúc mừng bạn lên +" + myLv);
+        } else {
+            myLv = 1;
+            alert("THẤT BẠI! Thẻ đã về +1.");
+        }
+        
+        bonusRate = 0; // Reset tỉ lệ sau khi đập
+        updateUI();
+    }
+
+    function exitToMenu() {
+        showTab('tab-pack');
+    }
+</script>
