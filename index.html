@@ -2,120 +2,174 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>FC Online - Match Engine</title>
+    <title>FC Online 4 Ultimate - Full Database</title>
     <style>
-        body { background: #1a1a1a; color: white; font-family: sans-serif; margin: 0; overflow: hidden; }
-        .top-bar { background: #0a285a; height: 50px; display: flex; align-items: center; padding: 0 20px; border-bottom: 2px solid #3498db; }
-        .container { display: flex; height: calc(100vh - 50px); }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: #111; color: white; font-family: 'Segoe UI', sans-serif; overflow: hidden; display: flex; flex-direction: column; height: 100vh; }
+        .top-bar { background: #0a285a; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #fde100; }
+        .main { display: flex; flex: 1; overflow: hidden; }
         
-        /* Sân vận động 2D */
-        .pitch { flex: 2; background: #2ecc71; position: relative; border: 5px solid white; margin: 20px; border-radius: 10px; overflow: hidden; }
-        .center-circle { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 100px; height: 100px; border: 2px solid white; border-radius: 50%; }
-        .half-line { position: absolute; top: 50%; width: 100%; height: 2px; background: white; }
-        .ball { position: absolute; width: 12px; height: 12px; background: white; border-radius: 50%; transition: 0.5s; z-index: 10; }
-        .player { position: absolute; width: 20px; height: 20px; border-radius: 50%; font-size: 10px; display: flex; align-items: center; justify-content: center; font-weight: bold; }
-        .team-a { background: red; color: white; }
-        .team-b { background: blue; color: white; }
+        /* Sidebar & Menu */
+        .sidebar { width: 200px; background: #000; padding: 10px; border-right: 1px solid #333; }
+        .menu-btn { width: 100%; padding: 12px; background: none; border: none; color: #ccc; text-align: left; cursor: pointer; font-weight: bold; }
+        .menu-btn:hover, .menu-btn.active { color: #fde100; background: rgba(253, 225, 0, 0.1); }
 
-        /* Bảng điều khiển */
-        .sidebar { flex: 1; background: rgba(0,0,0,0.8); padding: 20px; border-left: 2px solid #444; }
-        .score-board { font-size: 30px; text-align: center; margin-bottom: 20px; background: #333; padding: 10px; border-radius: 5px; }
-        .log { height: 200px; overflow-y: auto; background: #111; padding: 10px; font-size: 13px; color: #aaa; margin-bottom: 20px; border-radius: 5px; }
-        .btn { width: 100%; padding: 15px; background: #fde100; color: #a50021; border: none; font-weight: bold; cursor: pointer; border-radius: 5px; }
+        /* Màn hình chính */
+        .content { flex: 1; padding: 20px; display: none; overflow-y: auto; position: relative; }
+        .content.active { display: block; }
+
+        /* Giao diện Sân bóng */
+        .pitch { width: 100%; height: 400px; background: #27ae60; border: 3px solid #fff; border-radius: 10px; position: relative; margin-bottom: 20px; }
+        .ball { width: 12px; height: 12px; background: #fff; border-radius: 50%; position: absolute; transition: 0.3s; box-shadow: 0 0 10px #fff; }
+
+        /* Thẻ cầu thủ */
+        .card { width: 140px; height: 200px; background: #fff; color: #000; border-radius: 8px; margin: 10px auto; display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: bold; text-align: center; border: 2px solid #ddd; }
+        .plus-8 { background: linear-gradient(135deg, #ffd700, #ff8c00) !important; color: #fff !important; box-shadow: 0 0 20px #ffd700; border: 2px solid #fff !important; }
+
+        .btn { padding: 10px 20px; border-radius: 5px; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; margin: 5px; }
+        .btn-gold { background: #fde100; color: #a50021; }
+        .log-box { background: #000; padding: 10px; border-radius: 5px; height: 100px; overflow-y: auto; font-size: 13px; color: #2ecc71; margin-top: 10px; }
     </style>
 </head>
 <body>
 
-<div class="top-bar">
-    <span>FC ONLINE: CHẾ ĐỘ GIẢ LẬP XH</span>
-    <span style="margin-left: auto;">BP: <strong id="bpDisplay">1,000,000</strong></span>
-</div>
-
-<div class="container">
-    <div class="pitch" id="pitch">
-        <div class="half-line"></div>
-        <div class="center-circle"></div>
-        <div id="ball" class="ball"></div>
-        </div>
-
-    <div class="sidebar">
-        <div class="score-board">
-            <span id="scoreA">0</span> : <span id="scoreB">0</span>
-        </div>
-        <div id="matchTime" style="text-align:center; margin-bottom:10px;">Phút: 0</div>
-        <div class="log" id="matchLog">Chào mừng đến với trận đấu...</div>
-        <button id="startBtn" class="btn" onclick="startMatch()">BẮT ĐẦU TRẬN ĐẤU</button>
-        <p style="font-size: 11px; color: #666; margin-top: 10px;">*Thắng nhận 500,000 BP, Hòa 200,000 BP</p>
+    <div class="top-bar">
+        <div><strong>FC ONLINE 4 CLONE</strong></div>
+        <div style="color: #fde100;">Tài khoản: <span id="bpDisplay">1,000,000</span> BP</div>
     </div>
-</div>
+
+    <div class="main">
+        <div class="sidebar">
+            <button class="menu-btn active" onclick="showTab('tab-pack')">MỞ GÓI QUÀ</button>
+            <button class="menu-btn" onclick="showTab('tab-match')">GIẢ LẬP XH</button>
+            <button class="menu-btn" onclick="showTab('tab-upgrade')">NÂNG CẤP (+)</button>
+        </div>
+
+        <div id="tab-pack" class="content active">
+            <h2>HỆ THỐNG GÓI CẦU THỦ</h2>
+            <div id="newCard" class="card" style="display:none;">
+                <div id="newName">?</div>
+                <div style="font-size:30px">+1</div>
+            </div>
+            <button class="btn btn-gold" onclick="openPack()">MỞ GÓI TOP 100 (100,000 BP)</button>
+        </div>
+
+        <div id="tab-match" class="content">
+            <div class="pitch" id="pitch">
+                <div class="ball" id="ball" style="top:50%; left:50%;"></div>
+            </div>
+            <div id="score" style="font-size: 24px; text-align: center;">0 : 0</div>
+            <button class="btn btn-gold" style="width:100%" onclick="startMatch()">BẮT ĐẦU TRẬN ĐẤU</button>
+            <div class="log-box" id="matchLog">Sẵn sàng thi đấu...</div>
+        </div>
+
+        <div id="tab-upgrade" class="content">
+            <h2>TRUNG TÂM NÂNG CẤP</h2>
+            <div id="upCard" class="card">
+                <div id="upName">CHƯA CÓ CẦU THỦ</div>
+                <div id="upLv" style="font-size:40px">+0</div>
+            </div>
+            <button class="btn btn-gold" onclick="upgrade()">NÂNG CẤP (50,000 BP)</button>
+            <button class="btn" style="background:#2ecc71; color:white;" onclick="sell()">BÁN LẤY TIỀN</button>
+        </div>
+    </div>
 
 <script>
-    let bp = parseInt(localStorage.getItem('fco_bp')) || 1000000;
-    let scoreA = 0; let scoreB = 0;
-    let matchInterval;
-    let time = 0;
+    // DATABASE TẤT CẢ CẦU THỦ
+    const database = [
+        "M. Salah", "V. Van Dijk", "L. Messi", "C. Ronaldo", "K. Mbappe", "E. Haaland", 
+        "Kevin De Bruyne", "Neymar Jr", "Son Heung Min", "Harry Kane", "Robert Lewandowski",
+        "Jude Bellingham", "Vinicius Jr", "Bruno Fernandes", "Alisson Becker", "S. Gerrard",
+        "F. Torres", "Kaka", "Z. Zidane", "Ronaldo De Lima", "Pele", "D. Maradona"
+    ];
 
-    function updateBP() {
+    let bp = parseInt(localStorage.getItem('fco_bp')) || 1000000;
+    let myPlayer = localStorage.getItem('fco_pName') || "Trống";
+    let myLv = parseInt(localStorage.getItem('fco_pLv')) || 0;
+
+    function updateUI() {
         document.getElementById('bpDisplay').innerText = bp.toLocaleString();
+        document.getElementById('upName').innerText = myPlayer.toUpperCase();
+        document.getElementById('upLv').innerText = "+" + myLv;
+        
+        const upCard = document.getElementById('upCard');
+        upCard.className = "card";
+        if(myLv >= 8) upCard.classList.add('plus-8');
+        else if(myLv >= 5) upCard.style.background = "#c0c0c0";
+
         localStorage.setItem('fco_bp', bp);
+        localStorage.setItem('fco_pName', myPlayer);
+        localStorage.setItem('fco_pLv', myLv);
+    }
+
+    function showTab(tabId) {
+        document.querySelectorAll('.content').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        event.currentTarget.classList.add('active');
+    }
+
+    function openPack() {
+        if (bp < 100000) return alert("Không đủ tiền!");
+        bp -= 100000;
+        myPlayer = database[Math.floor(Math.random() * database.length)];
+        myLv = 1;
+        document.getElementById('newCard').style.display = "flex";
+        document.getElementById('newName').innerText = myPlayer;
+        updateUI();
+    }
+
+    function upgrade() {
+        if (myLv === 0) return alert("Hãy mở gói trước!");
+        if (bp < 50000) return alert("Không đủ tiền!");
+        bp -= 50000;
+        const rate = [1, 0.7, 0.5, 0.3, 0.15, 0.07, 0.03][myLv-1] || 0.01;
+        if (Math.random() < rate) {
+            myLv++;
+            alert("THÀNH CÔNG LÊN +" + myLv);
+        } else {
+            myLv = 1;
+            alert("THẤT BẠI VỀ +1");
+        }
+        updateUI();
     }
 
     function startMatch() {
-        document.getElementById('startBtn').disabled = true;
-        scoreA = 0; scoreB = 0; time = 0;
-        document.getElementById('matchLog').innerHTML = "Trận đấu bắt đầu!<br>";
+        let scoreA = 0; let scoreB = 0; let time = 0;
+        const log = document.getElementById('matchLog');
+        log.innerHTML = "Trận đấu của " + myPlayer + " bắt đầu...<br>";
         
-        matchInterval = setInterval(() => {
-            time += 5;
-            document.getElementById('matchTime').innerText = "Phút: " + time;
-            
-            // Di chuyển bóng ngẫu nhiên
+        const match = setInterval(() => {
+            time += 10;
             const ball = document.getElementById('ball');
-            ball.style.left = Math.random() * 90 + "%";
             ball.style.top = Math.random() * 90 + "%";
-
-            // Sự kiện ghi bàn ngẫu nhiên
-            if (Math.random() < 0.1) {
-                if (Math.random() > 0.5) {
-                    scoreA++;
-                    document.getElementById('scoreA').innerText = scoreA;
-                    addLog(time + "': VÀOOO! Đội nhà ghi bàn!");
-                } else {
-                    scoreB++;
-                    document.getElementById('scoreB').innerText = scoreB;
-                    addLog(time + "': Đối thủ ghi bàn bất ngờ!");
-                }
+            ball.style.left = Math.random() * 90 + "%";
+            
+            if (Math.random() < 0.15) {
+                scoreA++;
+                log.innerHTML = "Phút " + time + "': " + myPlayer + " GHI BÀN!<br>" + log.innerHTML;
             }
-
+            document.getElementById('score').innerText = scoreA + " : " + scoreB;
+            
             if (time >= 90) {
-                clearInterval(matchInterval);
-                endMatch();
+                clearInterval(match);
+                let reward = scoreA * 100000;
+                bp += reward;
+                alert("KẾT THÚC! Bạn ghi " + scoreA + " bàn và nhận " + reward.toLocaleString() + " BP");
+                updateUI();
             }
         }, 500);
     }
 
-    function addLog(msg) {
-        const log = document.getElementById('matchLog');
-        log.innerHTML = msg + "<br>" + log.innerHTML;
+    function sell() {
+        if (myLv === 0) return;
+        let price = 200000 * Math.pow(3, myLv - 1);
+        bp += Math.floor(price);
+        myPlayer = "Trống"; myLv = 0;
+        updateUI();
     }
 
-    function endMatch() {
-        document.getElementById('startBtn').disabled = false;
-        let reward = 0;
-        if (scoreA > scoreB) {
-            reward = 500000;
-            alert("CHIẾN THẮNG! Bạn nhận được 500,000 BP");
-        } else if (scoreA === scoreB) {
-            reward = 200000;
-            alert("HÒA! Bạn nhận được 200,000 BP");
-        } else {
-            alert("THẤT BẠI! Không nhận được thưởng.");
-        }
-        bp += reward;
-        updateBP();
-    }
-    
-    updateBP();
+    updateUI();
 </script>
 </body>
 </html>
