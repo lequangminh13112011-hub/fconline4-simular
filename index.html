@@ -173,3 +173,18 @@
 </script>
 </body>
 </html><button class="btn" style="background: #444; color: white; margin-top: 10px;" onclick="exitMatch()">THOÁT RA MENU</button>
+function exitMatch() {
+    // Dừng trận đấu ngay lập tức nếu đang chạy
+    clearInterval(matchInterval);
+    matchRunning = false;
+    
+    // Reset lại giao diện bóng và tỉ số
+    document.getElementById('scoreA').innerText = "0";
+    document.getElementById('scoreB').innerText = "0";
+    document.getElementById('matchTime').innerText = "Phút: 0";
+    
+    // Chuyển về tab Menu chính (ví dụ tab mở gói hoặc nâng cấp)
+    showTab('tab-pack'); // Hoặc tab nào bạn muốn quay về
+    
+    alert("Đã thoát trận đấu và quay về sảnh chính!");
+}
