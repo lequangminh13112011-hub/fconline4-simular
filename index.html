@@ -108,4 +108,152 @@
     updateUI();
 </script>
 </body>
+</html><!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>FC Online Pro Dashboard</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { 
+            background: url('https://images.unsplash.com/photo-1508098682722-e99c43a406b2?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80') no-repeat center center fixed;
+            background-size: cover;
+            color: white; font-family: 'Segoe UI', Arial, sans-serif;
+            height: 100vh; overflow: hidden;
+        }
+        /* Lớp phủ làm tối nền */
+        .overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: -1; }
+
+        /* Top Bar */
+        .top-bar { 
+            background: rgba(43, 87, 154, 0.9); height: 50px; 
+            display: flex; align-items: center; padding: 0 20px;
+            border-bottom: 2px solid #3498db; font-size: 13px;
+        }
+        .top-menu { display: flex; list-style: none; margin-left: 50px; }
+        .top-menu li { margin-right: 30px; cursor: pointer; text-transform: uppercase; font-weight: bold; color: #ddd; }
+        .top-menu li:hover { color: #fff; border-bottom: 2px solid #fff; }
+
+        /* Sidebar Menu */
+        .sidebar { position: absolute; left: 50px; top: 150px; width: 250px; }
+        .side-item { 
+            padding: 12px 20px; font-size: 18px; font-weight: bold; 
+            text-transform: uppercase; cursor: pointer; transition: 0.3s;
+            margin-bottom: 5px; display: flex; align-items: center;
+        }
+        .side-item:hover { background: rgba(255,255,255,0.2); transform: translateX(10px); }
+        .tag-gray { font-size: 10px; background: #666; padding: 2px 5px; margin-left: 10px; border-radius: 3px; }
+
+        /* Trung tâm đập thẻ (Game Container) */
+        .main-content { 
+            position: absolute; right: 50px; top: 100px; 
+            background: rgba(0,0,0,0.7); padding: 25px; 
+            border-radius: 15px; width: 320px; text-align: center;
+            border-top: 5px solid #a50021;
+        }
+        .bp-display { color: #fde100; font-size: 20px; margin-bottom: 15px; border-bottom: 1px solid #444; padding-bottom: 10px; }
+        .card { 
+            width: 140px; height: 200px; background: #fff; color: #000; 
+            border-radius: 8px; margin: 15px auto; display: flex; flex-direction: column; 
+            justify-content: center; font-weight: bold; position: relative;
+        }
+        .plus-8 { background: linear-gradient(135deg, #ffd700, #ff8c00) !important; color: white !important; box-shadow: 0 0 20px #ffd700; }
+        
+        /* Bottom Bar */
+        .bottom-bar { 
+            position: fixed; bottom: 0; width: 100%; background: rgba(0,0,0,0.8); 
+            height: 40px; display: flex; align-items: center; padding: 0 20px; font-size: 12px;
+        }
+        .bottom-menu { display: flex; list-style: none; }
+        .bottom-menu li { margin-right: 20px; color: #aaa; cursor: pointer; }
+
+        button { width: 100%; padding: 10px; margin-top: 10px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .btn-up { background: #fde100; color: #a50021; }
+    </style>
+</head>
+<body>
+    <div class="overlay"></div>
+
+    <div class="top-bar">
+        <img src="https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg" width="30" alt="LFC">
+        <ul class="top-menu">
+            <li>Đại diện thông tin đội</li>
+            <li>Club House</li>
+            <li>Đại diện quản lý đội</li>
+            <li>Chiến thuật nhóm</li>
+        </ul>
+        <div style="margin-left: auto;">LV.8 | BP: <span id="bpHeader" style="color:#fde100">1,000,000</span></div>
+    </div>
+
+    <div class="sidebar">
+        <div class="side-item">Trận XH <span class="tag-gray">VS Người chơi</span></div>
+        <div class="side-item">XH 2vs2 <span class="tag-gray">VS Người chơi</span></div>
+        <div class="side-item" style="color: #fde100;">Giả lập XH <span class="tag-gray">AUTO</span></div>
+        <div class="side-item">Squad Battle <span class="tag-gray">VS AI</span></div>
+        <div class="side-item">Arena <span class="tag-gray">VS Người chơi</span></div>
+    </div>
+
+    <div class="main-content">
+        <div class="bp-display">TÀI KHOẢN BP: <span id="bpMain">1,000,000</span></div>
+        <div id="card" class="card">
+            <div id="playerName">K. DALGLISH</div>
+            <div id="lvDisplay" style="font-size: 35px;">+1</div>
+        </div>
+        <button class="btn-up" onclick="upgrade()">NÂNG CẤP THẺ</button>
+        <button style="background:#3498db; color:white;" onclick="openPack()">MỞ GÓI CẦU THỦ</button>
+        <p id="log" style="font-size:12px; margin-top:10px; color:#ccc;">Sẵn sàng phá án!</p>
+    </div>
+
+    <div class="bottom-bar">
+        <ul class="bottom-menu">
+            <li>● Quản lý CT</li>
+            <li>● TT Nhiệm vụ</li>
+            <li>● TT Chuyển nhượng</li>
+            <li>● Vật phẩm</li>
+            <li>● Shop</li>
+        </ul>
+    </div>
+
+    <script>
+        let bp = 1000000;
+        let lv = 1;
+        const players = ["K. Dalglish", "S. Gerrard", "Fernando Torres", "Luis Suarez"];
+        let currentName = "K. DALGLISH";
+
+        function updateUI() {
+            document.getElementById('bpMain').innerText = bp.toLocaleString();
+            document.getElementById('bpHeader').innerText = bp.toLocaleString();
+            document.getElementById('lvDisplay').innerText = "+" + lv;
+            document.getElementById('playerName').innerText = currentName;
+            
+            const card = document.getElementById('card');
+            card.className = "card";
+            if (lv === 8) card.classList.add('plus-8');
+            else if (lv >= 5) card.style.background = "#c0c0c0";
+        }
+
+        function upgrade() {
+            if (bp < 20000) return;
+            bp -= 20000;
+            const rates = [1, 0.7, 0.5, 0.3, 0.1, 0.05, 0.02];
+            if (Math.random() < rates[lv-1]) {
+                lv++;
+                document.getElementById('log').innerText = "THÀNH CÔNG!";
+            } else {
+                lv = 1;
+                document.getElementById('log').innerText = "THẤT BẠI!";
+            }
+            updateUI();
+        }
+
+        function openPack() {
+            if (bp < 50000) return;
+            bp -= 50000;
+            currentName = players[Math.floor(Math.random()*players.length)].toUpperCase();
+            lv = 1;
+            document.getElementById('log').innerText = "MỞ RA " + currentName;
+            updateUI();
+        }
+    </script>
+</body>
 </html>
