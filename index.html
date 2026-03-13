@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>FC Online Ultimate - Save Game Edition</title>
+    <style>
+        body { background: #0a0a0a; color: white; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; padding: 10px; }
+        .header { background: #1a1a1a; width: 100%; max-width: 380px; padding: 15px; border-radius: 15px; display: flex; justify-content: space-between; margin-bottom: 15px; border: 1px solid #333; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        .bp-val { color: #fde100; font-weight: bold; font-size: 1.1em; }
+        .game-container { background: #a50021; padding: 20px; border-radius: 25px; box-shadow: 0 15px 50px rgba(0,0,0,0.8); width: 340px; text-align: center; border: 3px solid #fde100; position: relative; }
+        .card { width: 150px; height: 220px; background: #fff; color: #000; border-radius: 12px; margin: 15px auto; display: flex; flex-direction: column; justify-content: center; font-weight: bold; transition: 0.4s; position: relative; overflow: hidden; }
+        .plus-8 { background: linear-gradient(135deg, #ffd700, #ff8c00) !important; color: #fff !important; box-shadow: 0 0 30px #ffd700; transform: scale(1.05); border: 2px solid #fff; }
+        .btn { width: 100%; padding: 12px; margin: 5px 0; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+        .btn-pack { background: #3498db; color: white; }
+        .btn-upgrade { background: #fde100; color: #a50021; }
+        .btn-sell { background: #2ecc71; color: white; }
+        #log { font-size: 13px; margin: 10px 0; font-weight: bold; height: 18px; color: #fde100; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <span>BP: <span id="bpDisplay" class="bp-val">1,000,000</span></span>
+        <button onclick="resetData()" style="font-size:10px; background:none; border:1px solid #555; color:#aaa; cursor:pointer;">Xóa dữ liệu</button>
+    </div>
+    <div class="game-container">
+        <div id="log">CHÀO MỪNG QUAY TRỞ LẠI!</div>
+        <div id="card" class="card">
+            <div id="nameDisplay">HÃY MỞ GÓI</div>
+            <div id="lvDisplay" style="font-size:40px;">?</div>
+            <div id="priceDisplay" style="font-size:11px; margin-top:10px;">0 BP</div>
+        </div>
+        <button class="btn btn-pack" onclick="openPack()">Mở Gói Quà (50k BP)</button>
+        <button id="upBtn" class="btn btn-upgrade" onclick="upgrade()" disabled>Nâng cấp (20k BP)</button>
+        <button id="sellBtn" class="btn btn-sell" onclick="sell()" disabled>Bán cầu thủ</button>
+    </div>
+
+<script>
+    let bp = parseInt(localStorage.getItem('bp')) || 1000000;
+    let currentLv = 1;
+    let currentBasePrice = 0;
+    let currentName = "HÃY MỞ GÓI";
+
+    const playerList = [
+        {name: "M. Salah", price: 120000}, {name: "V. Van Dijk", price: 110000},
+        {name: "S. Gerrard", price: 500000}, {name: "Luis Diaz", price: 80000},
+        {name: "Alisson", price: 90000}, {name: "D. Nunez", price: 70000},
+        {name: "F. Torres", price: 450000}, {name: "Xabi Alonso", price: 400000}
+    ];
+
+    function updateUI() {
+        localStorage.setItem('bp', bp);
+        document.getElementById('bpDisplay').innerText = bp.toLocaleString();
+        document.getElementById('lvDisplay').innerText = "+" + currentLv;
+        document.getElementById('nameDisplay').innerText = currentName;
+
+        let currentPrice = currentBasePrice * Math.pow(2.8, currentLv - 1);
+        if (currentLv >= 5) currentPrice *= 2;
+        if (currentLv === 8) currentPrice *= 6;
+        document.getElementById('priceDisplay').innerText = Math.floor(currentPrice).toLocaleString() + " BP";
+        
+        const card = document.getElementById('card');
+        card.className = "card";
+        if (currentLv >= 8) card.classList.add('plus-8');
+        else if (currentLv >= 5) card.style.background = "#c0c0c0";
+        else card.style.background = "#fff";
+
+        document.getElementById('upBtn').disabled = currentBasePrice === 0;
+        document.getElementById('sellBtn').disabled = currentBasePrice === 0;
+    }
+
+    function openPack() {
+        if (bp < 50000) return;
+        bp -= 50000;
+        const rand = playerList[Math.floor(Math.random() * playerList.length)];
+        currentName = rand.name; currentBasePrice = rand.price; currentLv = 1;
+        document.getElementById('log').innerText = "MỞ RA " + currentName.toUpperCase();
+        updateUI();
+    }
+
+    function upgrade() {
+        if (bp < 20000) return;
+        bp -= 20000;
+        const rates = [1, 0.65, 0.45, 0.28, 0.12, 0.06, 0.02];
+        if (Math.random() < rates[currentLv - 1]) {
+            currentLv++;
+            document.getElementById('log').innerText = "THÀNH CÔNG!";
+        } else {
+            currentLv = 1;
+            document.getElementById('log').innerText = "XỊT RỒI!";
+        }
+        updateUI();
+    }
+
+    function sell() {
+        let currentPrice = currentBasePrice * Math.pow(2.8, currentLv - 1);
+        if (currentLv >= 5) currentPrice *= 2;
+        if (currentLv === 8) currentPrice *= 6;
+        bp += Math.floor(currentPrice);
+        currentBasePrice = 0; currentName = "HÃY MỞ GÓI"; currentLv = 1;
+        updateUI();
+    }
+
+    function resetData() {
+        localStorage.clear();
+        location.reload();
+    }
+
+    updateUI();
+</script>
+</body>
+</html>
